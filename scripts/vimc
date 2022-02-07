@@ -1,0 +1,20 @@
+#!/bin/bash
+
+FILE=$1
+
+TEMPLATE="$HOME/.my_templates/template.c"
+POINTERS="pointers.h"
+MCH="mc.h"
+
+if [ -e $FILE ]; then
+	vim $FILE;
+else
+	if [ -e $POINTERS ]; then
+		TEMPLATE=$TEMPLATE.p;
+	fi
+	if [ -e $MCH ]; then
+		TEMPLATE=$TEMPLATE.m;
+	fi
+	cp "$TEMPLATE" "$FILE";
+	vim $FILE;
+fi

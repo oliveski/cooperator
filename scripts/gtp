@@ -1,0 +1,55 @@
+#!/bin/bash
+
+# Get template
+
+TEMPLATES=(
+	pointers.h
+	mc.h
+	media.awk
+	histogramas.gp
+	batch_avg.sh
+	amostras.sh
+	job.sh
+)
+
+
+if [[ $1 == "" ]]; then
+	echo "Available templates:"
+	i=0;
+	for temp in ${TEMPLATES[@]}; do
+		echo "$i - $temp"
+		i=$(($i + 1))
+	done
+	exit 0
+fi
+
+if [[ $1 == "--help" ]]; then
+	echo "This script copies templates into the working directory."
+	echo "Calling it with no arguments prints out available templates."
+	echo "Choose template with the following list"
+	i=0;
+	for temp in ${TEMPLATES[@]}; do
+		echo "$i - $temp"
+		i=$(($i + 1))
+	done
+	exit 0
+fi
+
+DIR=$HOME/.my_templates
+if [[ "${TEMPLATES[$1]}" != "" ]]; then
+	FILE=${TEMPLATES[$1]}
+
+	if [[ ! -e $FILE ]]; then
+		cp $DIR/$FILE .;
+		if [[ $? == "0" ]]; then
+			echo -e "\n$FILE copied\n"
+		else
+			echo -e "There was an error"
+		fi
+	else
+		echo -e "\n$FILE already exists in this directory\n"
+	fi
+else
+	echo "Invalid selection"
+	echo "Try 'gtp --help' for more information"
+fi
