@@ -1,3 +1,8 @@
+/*
+ * gcc -Wall simulacao.c spatial_games.c -o exe -lm
+ * -lgsl -lgslcblas
+ * ./exe L r semente tau M crit
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -25,6 +30,7 @@ void printParams(Params p){
 int main(int argc, char *argv[]){
 
 	Lattice net;
+	Memory mem;
 	Params p;
 
 	getParams(&p, argc, argv);
@@ -34,6 +40,9 @@ int main(int argc, char *argv[]){
 	gsl_rng_set(r, p.seed);
 
 	initLattice(&net, p.L);
+	printf("Lattice initiated\n");
+	initMemory(&mem, p);
+	printf("Memory initiated\n");
 
 	int count = 0;
 	for(int i = 0; i < p.L*p.L; i++){
@@ -67,7 +76,8 @@ int main(int argc, char *argv[]){
 		if(count % p.L == 0) printf("\n");
 	}
 
-	freeLattice(&net, p.L);
+	freeLattice(&net);
+	freeMemory(&mem, p);
 
 	return 0;
 }

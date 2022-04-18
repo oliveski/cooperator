@@ -20,6 +20,10 @@ typedef struct{
 	int *n;
 } Lattice;
 
+typedef struct {
+	int *n;
+	int **hist;
+} Memory;
 
 void getParams(Params *p, int argc, char *argv[]);
 
@@ -29,6 +33,10 @@ int int_powerlawRng(Params p);
 
 void initLattice(Lattice *net, int L);
 
-void freeLattice(Lattice *net, int L);
+void freeLattice(Lattice *net);
+
+void initMemory(Memory *mem, Params p);
+
+void freeMemory(Memory *mem, Params p);
 
 #endif

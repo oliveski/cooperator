@@ -63,9 +63,30 @@ void initLattice(Lattice *net, int L){
 
 }
 
-void freeLattice(Lattice *net, int L){
-	int L2 = L*L;
+void freeLattice(Lattice *net){
 	free(net->players);
 	free(net->neigh);
 	free(net->links);
+}
+
+void initMemory(Memory *mem, Params p){
+	mem->hist = (int **) malloc(p.L2 * sizeof(int *));
+	mem->n = (int *) malloc(p.L2 * sizeof(int));
+
+	for(int i = 0; i < p.L2; i++){
+		mem->hist[i] = (int *) malloc(p.M * sizeof(int));
+	}
+
+	for(int i = 0; i < p.L2; i++){
+		mem->n[i] = int_powerlawRng(p);
+		for(int j = 0; j < p.M; j++){
+			mem->hist[i][j] = 1;
+		}
+	}
+}
+
+void freeMemory(Memory *mem, Params p){
+	free(mem->n);
+	for(int i = 0; i < p.L2; i++) free(mem->hist[i]);
+	free(mem->hist);
 }
