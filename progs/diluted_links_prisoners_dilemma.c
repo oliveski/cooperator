@@ -41,70 +41,40 @@ int main(int argc, char *argv[]){
 
 	initLattice(&net, p.L);
 	initMemory(&mem, net, p);
-	printNet(net);
-	printMemory(mem, p);
+	/* printNet(net); */
+	/* printMemory(mem, p); */
 
 	////////////////////////
 
 	int t;	// time
-	/* int transient_indicator = 0; */
-	int transient_indicator = 1;
 	char series_filename[1000];
 	sprintf(series_filename, "r%.4lf_L%d_S%d_M%d_tau%.4f.dat", p.r, p.L, p.seed, p.M, p.tau);
 	FILE *series = fopen(series_filename, "w");
 
 	for(int mcs = 1; mcs <= MCS; mcs++){
+		// index of history
 		t = mcs % p.M;
 		diluteLinks(&net, mem, p, t);
 		for(int i = 0; i < p.L2; i++)
-		/* for(int i = 0; i < 1; i++) */
 			playGame(&net, &mem, p, t);
-		/* printf("%d %d %d\n", mcs, net.coop_count, net.link_count); */
-		if(transient_indicator == 1 || mcs >= TRAN){
-			if(!transient_indicator){
-				transient_indicator = 1;
-				// Extinction
-				if(net.coop_count == p.L2 || net.coop_count == 0){
-					/* int j = mcs; */
-					/* while(j <= MCS - mcs){ */
-					/* 	if(j % WSIZE == 0) */
-					/* 		fprintf(series, "%d %d %d\n", j-TRAN, net.coop_count, net.link_count); */
-					/* } */
-					printf("ext 1 (mcs=%d)\n", mcs);
-					fclose(series);
-					freeLattice(&net);
-					freeMemory(&mem, p);
-					gsl_rng_free(r);
-					return 0;
-				}
+		// if we should measure, we measure
+		if(mcs >= TRAN && mcs % WSIZE == 0){
+			// Test for extinction
+			if(net.coop_count == p.L2 || net.coop_count == 0){
+				dumpExtinct(net, series, mcs);
+				fclose(series);
+				freeLattice(&net);
+				freeMemory(&mem, p);
+				gsl_rng_free(r);
+				return 0;
 			}
-
-			// Extinction
-			/* if(net.coop_count == p.L2 || net.coop_count == 0){ */
-			/* 	/1* int j = mcs; *1/ */
-			/* 	/1* while(j <= MCS - mcs){ *1/ */
-			/* 	/1* 	if(j % WSIZE == 0) *1/ */
-			/* 	/1* 		fprintf(series, "%d %d %d\n", j-TRAN, net.coop_count, net.link_count); *1/ */
-			/* 	/1* 	j++; *1/ */
-			/* 	/1* } *1/ */
-			/* 	printf("ext 2 (mcs=%d)\n", mcs); */
-			/* 	fclose(series); */
-			/* 	freeLattice(&net); */
-			/* 	freeMemory(&mem, p); */
-			/* 	gsl_rng_free(r); */
-			/* 	return 0; */
-			/* } */
-
-			if(mcs % WSIZE == 0){
-				/* printf("%d %d %d\n", mcs-TRAN, net.coop_count, net.link_count); */
-				fprintf(series, "%d %d %d\n", mcs-TRAN, net.coop_count, net.link_count);
-			}
+			fprintf(series, "%d %d %d\n", mcs-TRAN, net.coop_count, net.link_count);
 		}
 	}
 	fclose(series);
 
-	printNet(net);
-	printMemory(mem, p);
+	/* printNet(net); */
+	/* printMemory(mem, p); */
 
 	////////////////////////
 
