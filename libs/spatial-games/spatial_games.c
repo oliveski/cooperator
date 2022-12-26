@@ -111,6 +111,9 @@ void initMemory(Memory *mem, Lattice net, Params p){
 
 	for(int i = 0; i < p.L2; i++){
 		mem->n[i] = int_powerlawRng(p);
+#ifdef DELTA
+		mem->n[i] = p.M;
+#endif
 		for(int j = 1; j < p.M; j++){
 			// at t=0 my history is equal to my strategy
 			// and t>0 is initiated as if I had cooperated
@@ -155,19 +158,19 @@ double payoffCalculation(Lattice net, Params p, int player){
 	double pay;
 
 	payoff = 0;
-	printf("Payoff para %d\n", player);
+	/* printf("Payoff para %d\n", player); */
 	for(int i = 0; i < 4; i++){
-		printf("viz %d: ", i);
+		/* printf("viz %d: ", i); */
 		link = net.links[player][i];
-		printf("link=%d ", link);
+		/* printf("link=%d ", link); */
 		neigh_state = net.players[net.neigh[player][i]];
-		printf("nstat=%d ", neigh_state);
+		/* printf("nstat=%d ", neigh_state); */
 		pay = p.payoffs[player_state][neigh_state];
-		printf("pay=%lf\n", pay);
+		/* printf("pay=%lf\n", pay); */
 		payoff += link * pay;
-		printf("\n");
+		/* printf("\n"); */
 	}
-	printf("payoff de %d: %lf\n", player, payoff);
+	/* printf("payoff de %d: %lf\n", player, payoff); */
 
 	return payoff;
 }
@@ -178,7 +181,7 @@ void strategyUpdate(Lattice *net, double Px, double Py, int player, int neigh){
 
 	if(random < prob){
 		net->players[player] = net->players[net->neigh[player][neigh]];
-		printf("[%d] trocou\n", player);
+		/* printf("[%d] trocou\n", player); */
 	}
 }
 
@@ -204,16 +207,16 @@ void printMemory(Memory mem, Params p){
 }
 
 void playGame(Lattice *net, Memory *mem, Params p, int t){
-	printf("MCS %d\n", t);
+	/* printf("MCS %d\n", t); */
 	int player = (int) gsl_rng_uniform_int(r, p.L2);
 	int init_state = net->players[player];
-	printf("Sorteado %d (%d)\n", player, init_state);
+	/* printf("Sorteado %d (%d)\n", player, init_state); */
 	int neigh = (int) gsl_rng_uniform_int(r, 4);
-	printf("vizinho %d\n", neigh);
+	/* printf("vizinho %d\n", neigh); */
 
 	double payoff_i = payoffCalculation(*net, p, player);
 	double payoff_j = payoffCalculation(*net, p, net->neigh[player][neigh]);
-	printf("Pi = %.4lf; Pj = %.4lf\n", payoff_i, payoff_j);
+	/* printf("Pi = %.4lf; Pj = %.4lf\n", payoff_i, payoff_j); */
 
 	strategyUpdate(net, payoff_i, payoff_j, player, neigh);
 
@@ -222,7 +225,7 @@ void playGame(Lattice *net, Memory *mem, Params p, int t){
 	
 	/* printf("#### %d ####\n", t); */
 	/* printNet(*net); */
-	printf("###########\n");
+	/* printf("###########\n"); */
 }
 
 void diluteLinks(Lattice *net, Memory mem, Params p, int t){
@@ -237,4 +240,11 @@ void diluteLinks(Lattice *net, Memory mem, Params p, int t){
 	for(int i = 0; i < p.L2; i++)
 		linkAvaliation(net, mem, p, t, i);
 
+}
+
+void dumpExtinct(Lattice net, FILE *series, int mcs){
+	while(mcs < MCS){
+		fprintf(series, "%d %d %d\n", mcs-TRAN, net.coop_count, net.link_count);
+		mcs += 50;
+	}
 }
