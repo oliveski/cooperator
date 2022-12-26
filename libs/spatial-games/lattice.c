@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <lat2eps.h>
+#include "spatial_games.h"
+#include "percolation.h"
 #include "lattice.h"
 
 void openlat(int L, int opt){
@@ -44,30 +46,95 @@ void openlat(int L, int opt){
 		lat2eps_init(L, L);
 
 		// site state 1
-		lat2eps_set_color(0,0xbdc9cb);
-		lat2eps_set_color(1,0x9cafb2);
-		lat2eps_set_color(2,0x7a9498);
-		lat2eps_set_color(3,0x5a7a7f);
-		lat2eps_set_color(4,0x3e5558);
+		/* lat2eps_set_color(0,0xbdc9cb); */
+		/* lat2eps_set_color(1,0x9cafb2); */
+		/* lat2eps_set_color(2,0x7a9498); */
+		/* lat2eps_set_color(3,0x5a7a7f); */
+		/* lat2eps_set_color(4,0x3e5558); */
+		lat2eps_set_color(0,0xccdbff);
+		lat2eps_set_color(1,0x99b7ff);
+		lat2eps_set_color(2,0x6693ff);
+		lat2eps_set_color(3,0x326eff);
+		lat2eps_set_color(4,0x004bff);
 
 		// site state 0
-		lat2eps_set_color(10,0xc3bacf);
-		lat2eps_set_color(11,0x8875a0);
-		lat2eps_set_color(12,0x604780);
-		lat2eps_set_color(13,0x391a61);
-		lat2eps_set_color(14,0x271243);
+		/* lat2eps_set_color(10,0xc3bacf); */
+		/* lat2eps_set_color(11,0x8875a0); */
+		/* lat2eps_set_color(12,0x604780); */
+		/* lat2eps_set_color(13,0x391a61); */
+		/* lat2eps_set_color(14,0x271243); */
+		lat2eps_set_color(10, 0xffcfcc);
+		lat2eps_set_color(11, 0xff9f99);
+		lat2eps_set_color(12, 0xff7066);
+		lat2eps_set_color(13, 0xff4032);
+		lat2eps_set_color(14, 0xff1100);
 	}
 }
 
-void printlat(int *lat_pt, char *snpsht, int L, int opt, int *bl, int *lpj){
+/* void printlat(int *lat_pt, char *snpsht, int L, int opt, int *bl, int *lpj){ */
+/* 	// prints the lattice to eps file */
+/* 	int i; */
+/* 	int L2 = L*L; */
+	
+/* 	// lattice */
+/* 	if(opt == 1){ */
+/* 		for(i = 0; i < L2; i++){ */
+/* 			lat2eps_set_site(i % L, (i / L), lat_pt[i]); */
+/* 		} */
+/* 		lat2eps_gen_eps(snpsht, 0, 0, L, L, 1, 3); */
+/* 		lat2eps_release(); */
+/* 	} */
+
+/* 	// links per site */
+/* 	if(opt == 2){ */
+/* 		for(i = 0; i < L2; i++){ */
+/* 			lat2eps_set_site(i % L, (i / L), lpj[i]); */
+/* 		} */
+/* 		lat2eps_gen_eps(snpsht, 0, 0, L, L, 1, 3); */
+/* 		lat2eps_release(); */
+/* 	} */
+
+/* 	// two biggest clusters */
+/* 	if(opt == 3){ */
+/* 		for(i = 0; i < L2; i++){ */
+/* 			if(lat_pt[i] == bl[0]){ */
+/* 				lat2eps_set_site(i % L, (i / L), 1); */
+/* 			} else if(lat_pt[i] == bl[1]){ */
+/* 				lat2eps_set_site(i % L, (i / L), 2); */
+/* 			} else{ */
+/* 				lat2eps_set_site(i % L, (i / L), 0); */
+/* 			} */
+/* 		} */
+/* 		lat2eps_gen_eps(snpsht, 0, 0, L, L, 1, 3); */
+/* 		lat2eps_release(); */
+/* 	} */
+
+/* 	// state + links shade */
+/* 	if(opt == 4){ */
+/* 		for(i = 0; i < L2; i++){ */
+/* 			if(lat_pt[i] == 1){	// Coop */
+/* 				lat2eps_set_site(i % L, (i / L), lpj[i]); */
+/* 			} */
+/* 			else{ */
+/* 				lat2eps_set_site(i % L, (i / L), 10 + lpj[i]); */
+/* 			} */
+/* 		} */
+/* 		lat2eps_gen_eps(snpsht, 0, 0, L, L, 1, 3); */
+/* 		lat2eps_release(); */
+/* 	} */
+
+/* } */
+
+void printlat(Lattice net, HKstuff hk, int *lpp, char *snpsht, int opt){
 	// prints the lattice to eps file
 	int i;
-	int L2 = L*L;
+	int L = net.L;
+	int L2 = net.L2;
 	
 	// lattice
 	if(opt == 1){
-		for(i = 0; i < L2; i++){
-			lat2eps_set_site(i % L, (i / L), lat_pt[i]);
+		for(int i = 0; i < L2; i++){
+			lat2eps_set_site(i % L, (i / L), net.players[i]);
 		}
 		lat2eps_gen_eps(snpsht, 0, 0, L, L, 1, 3);
 		lat2eps_release();
@@ -75,8 +142,8 @@ void printlat(int *lat_pt, char *snpsht, int L, int opt, int *bl, int *lpj){
 
 	// links per site
 	if(opt == 2){
-		for(i = 0; i < L2; i++){
-			lat2eps_set_site(i % L, (i / L), lpj[i]);
+		for(int i = 0; i < L2; i++){
+			lat2eps_set_site(i % L, (i / L), lpp[i]);
 		}
 		lat2eps_gen_eps(snpsht, 0, 0, L, L, 1, 3);
 		lat2eps_release();
@@ -84,12 +151,14 @@ void printlat(int *lat_pt, char *snpsht, int L, int opt, int *bl, int *lpj){
 
 	// two biggest clusters
 	if(opt == 3){
-		for(i = 0; i < L2; i++){
-			if(lat_pt[i] == bl[0]){
+		for(int i = 0; i < L2; i++){
+			if(hk.clusters[i] == hk.biggest_labels[0]){
 				lat2eps_set_site(i % L, (i / L), 1);
-			} else if(lat_pt[i] == bl[1]){
+			}
+			else if(hk.clusters[i] == hk.biggest_labels[1]){
 				lat2eps_set_site(i % L, (i / L), 2);
-			} else{
+			}
+			else{
 				lat2eps_set_site(i % L, (i / L), 0);
 			}
 		}
@@ -99,12 +168,12 @@ void printlat(int *lat_pt, char *snpsht, int L, int opt, int *bl, int *lpj){
 
 	// state + links shade
 	if(opt == 4){
-		for(i = 0; i < L2; i++){
-			if(lat_pt[i] == 1){	// Coop
-				lat2eps_set_site(i % L, (i / L), lpj[i]);
+		for(int i = 0; i < L2; i++){
+			if(net.players[i] == 1){	// Coop
+				lat2eps_set_site(i % L, (i / L), lpp[i]);
 			}
 			else{
-				lat2eps_set_site(i % L, (i / L), 10 + lpj[i]);
+				lat2eps_set_site(i % L, (i / L), 10 + lpp[i]);
 			}
 		}
 		lat2eps_gen_eps(snpsht, 0, 0, L, L, 1, 3);

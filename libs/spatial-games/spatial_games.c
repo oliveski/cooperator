@@ -242,6 +242,19 @@ void diluteLinks(Lattice *net, Memory mem, Params p, int t){
 
 }
 
+int *linksPerPlayer(Lattice net){
+	int L2 = net.L2;
+	int *lpp = (int *) malloc(L2 * sizeof(int));
+	for(int i = 0; i < L2; i++) lpp[i] = 0;
+
+	for(int i = 0; i < L2; i++){
+		for(int j = 0; j < 4; j++){
+			lpp[i] += net.links[i][j];
+		}
+	}
+	return lpp;
+}
+
 void dumpExtinct(Lattice net, FILE *series, int mcs){
 	while(mcs < MCS){
 		fprintf(series, "%d %d %d\n", mcs-TRAN, net.coop_count, net.link_count);

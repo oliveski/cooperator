@@ -10,8 +10,8 @@
 #include <lat2eps.h>
 #include <gsl/gsl_rng.h>
 #include "spatial_games.h"
-#include "lattice.h"
 #include "percolation.h"
+#include "lattice.h"
 
 #define SNAP 1
 
@@ -31,7 +31,6 @@ void printParams(Params p){
 
 int main(int argc, char *argv[]){
 
-	printf("%d\n", WSIZE);
 	Lattice net;
 	Memory mem;
 	Params p;
@@ -100,6 +99,16 @@ int main(int argc, char *argv[]){
 	bond_hk(net, &hks);
 	percolation_measures(&hks);
 	freeHK(&hks);
+
+	// snapshots
+	int *lpp = linksPerPlayer(net);
+	char snpsht[100];
+	sprintf(snpsht, "snpsht_r%.4lf_L%d_S%d_M%d_tau%.4f.eps",
+			p.r, p.L, p.seed, p.M, p.tau);
+
+	openlat(p.L, 4);
+	printlat(net, hks, lpp, snpsht, 4);
+
 
 	///////// debug ////////
 	/* printNet(net); */

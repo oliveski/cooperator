@@ -59,6 +59,8 @@ void playGame(Lattice *net, Memory *mem, Params p, int t);
 
 void diluteLinks(Lattice *net, Memory mem, Params p, int t);
 
+int *linksPerPlayer(Lattice net);
+
 void dumpExtinct(Lattice net, FILE *series, int mcs);
 
 #endif
